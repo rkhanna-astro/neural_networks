@@ -94,10 +94,13 @@ def extract_nodes(file_name: str, threshold):
     print(f"the total number of nodes with a value higher than threshold {threshold} is " + str(num_nodes))
 
     # Plot the labeled nodes
-    # plt.figure(2)
-    # plt.imshow(labeled_array, cmap='nipy_spectral', origin='lower')
-    # plt.colorbar(label="Node Label")
-    # plt.title(f"Identified Nodes (Threshold: {threshold})")
-    # plt.show()
+    plt.figure(2)
+    plt.imshow(labeled_array, cmap='nipy_spectral', origin='lower')
+    plt.colorbar(label="Node Label")
+    plt.title(f"Identified Nodes (Threshold: {threshold})")
+    plt.show()
 
-    return nodes
+    return {
+        'nodes': nodes, 
+        'plots': labeled_array,
+    }

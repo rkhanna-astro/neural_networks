@@ -16,14 +16,23 @@ fig, axes = plt.subplots(2)
 
 counts, bins = np.histogram(clustering_coefficient, bins=10)
 fractions_clustering = counts / total_nodes
-axes[0].bar(bins[:-1], fractions_clustering, width=np.diff(bins), color='skyblue', edgecolor='black', alpha=0.7)
+
+axes[0].set_title("Clustering Coefficient")
+axes[0].set_xlabel("clustering coefficient C")
+axes[0].set_ylabel("N(C)/N_total")
+axes[0].hist(bins[:-1], bins, weights=fractions_clustering, histtype='step', linewidth = 2)
 
 counts_2, bins_2 = np.histogram(degree_centrality, bins=10)
 fractions_degree = counts_2 / total_nodes
-axes[1].bar(bins_2[:-1], fractions_degree, width=np.diff(bins_2), color='blue', edgecolor='black', alpha=0.7)
+
+axes[1].set_title("Degree Centrality")
+axes[1].set_xlabel("degree centrality C_d")
+axes[1].set_ylabel("N(C_d)/N_total")
+axes[1].hist(bins_2[:-1], bins_2, weights=fractions_degree, histtype='step', linewidth = 2)
 
 # plt.hist(clustering_coefficient, bins=30, density=True, color='skyblue', edgecolor='black', alpha=0.7)
 # plt.imshow(dark_matter_density_data, cmap='gray', origin='lower')
 # plt.colorbar()
 # plt.title("FITS Image")
+plt.tight_layout()
 plt.show()

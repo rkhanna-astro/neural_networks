@@ -3,7 +3,7 @@ from astropy.io import fits
 import AM9642_Neural_netowk_midterm_project______ as extract_nodes
 
 # Importing fits file
-
+# The function network_properties calculate all the properties for both cosmic 
 def network_properties(file_name: str):
     threshold = None
     flattened_data = None
@@ -15,44 +15,22 @@ def network_properties(file_name: str):
         # There are two levels in cosmic data, 1st gas density and 2nd dark matter density
         # gas_density_data = cosmic_web_intensity_data[0].data[0]
         dark_matter_density_data = cosmic_web_intensity_data[0].data[1]
-    
-        # We only work with dark matter data as it's has better intensity peaks 
-        max_density = np.max(dark_matter_density_data)
-        length = dark_matter_density_data.shape[0]
-        width = dark_matter_density_data.shape[1]
 
-        # Normalizing the values for lower computational costs
-        # for x in range(length):
-        #     for y in range(width):
-        #         dark_matter_density_data[x][y] = dark_matter_density_data[x][y]/max_density
-
+        # Flattening cosmic web data to get the top 1 % percentile values
         flattened_data = dark_matter_density_data.flatten()
     elif 'CORTEX' in file_name:
+        # Importing the cortex fits file data
         cortex_data = fits.open(file_name)[0].data
-        
-        # max_density = np.max(cortex_data)
-        # length = cortex_data.shape[0]
-        # width = cortex_data.shape[1]
 
-        # for x in range(length):
-        #     for y in range(width):
-        #         cortex_data[x][y] = cortex_data[x][y]/max_density
-
+        # Flattening cortex data to get the top 0.2 % percentile values
         flattened_data = cortex_data.flatten()
     else:
+        # Importing the cerebellum fits file data
         cerebellum_data = fits.open(file_name)[0].data
         
-        # max_density = np.max(cerebellum_data)
-        # length = cerebellum_data.shape[0]
-        # width = cerebellum_data.shape[1]
-
-        # for x in range(length):
-        #     for y in range(width):
-        #         cerebellum_data[x][y] = cerebellum_data[x][y]/max_density
-        
+        # Flattening cerebellum data to get the top 0.2 % percentile values
         flattened_data = cerebellum_data.flatten()
-        
-    # Flattening data for then to get the top 1 value%
+
     # This gets the top 1% threshold value
     if 'gas' in file_name:
         cut_off = 98.5
@@ -61,16 +39,17 @@ def network_properties(file_name: str):
     else:
         cut_off = 99.8
     
-    print(cut_off)
+    print("Here is the cut_off", cut_off)
     threshold = np.percentile(flattened_data, cut_off)
-    print(threshold)
-    nodes = extract_nodes.extract_nodes(file_name, threshold)
-    print(len(nodes))
+    values = extract_nodes.extract_nodes(file_name, threshold)
+    nodes = values['nodes']
+    # labeled_array = values['plots']
+    print("The total number of nodes", len(nodes))
 
-    # print(threshold)
-    # Now we can create a set of potential nodes using their co-ordinates in pixel 2-D array
+    # Now we can create a set of potential nodes using their co-ordinates in pixel 2-D array.
     potential_nodes = set()
 
+    # This algorithm gets the centroid pixel for each node collection.
     for node, values in nodes.items():
         coordinates = values['coords']
         sum_x = 0
@@ -96,8 +75,8 @@ def network_properties(file_name: str):
                 cen_x = x
                 cen_y = y
 
+        # We add these nodes to the potential nodes set for then to create adjacency matrix.
         potential_nodes.add((cen_x, cen_y))
-
 
     # for x in range(length):
     #     for y in range(width):
@@ -121,34 +100,37 @@ def network_properties(file_name: str):
 
     # # print(len(potential_nodes))
 
-    # calculating total number of nodes that are left and represent a big node in the image.
+    # We calculate total number of nodes that we finally select for then to create edges and adjacency matrix.
     number_of_nodes = len(potential_nodes)
 
-    # creating adjacency matrix
+    # We initiate adjacency matrix
     adjacency_matrix = np.zeros(shape=(number_of_nodes, number_of_nodes))
 
-    # now we mark all the selected nodes to a particular position in matrix
+    # Now we mark all the selected nodes to a particular position in our matrix
     matrix_map = {}
     pos = 0
 
-    # this is random but will not impact our calculations
+    # This is random mapping but will not impact our calculations
     for x,y in potential_nodes:
         matrix_map[(x, y)] = pos
         pos += 1
 
-    # now we mark the close nodes with edges, this is done by using the linking length in paper
+    # Now we mark the close nodes with edges, this is done by using the linking length in paper
     # as each node is 0.04 Mpc long and we form an edge if the distance between two nodes is less than
-    # 1.2 Mpc, it means we can go in any direction at most 31 co-ordinates (excluding original)
+    # 1.2 Mpc, it means we can go in any direction at most 30 co-ordinates (excluding original)
     # this algorithm will check the difference in position of all nodes with current node
-    # and if less than 31 co-ordinates it will form an undirected edge with that node.
+    # and if less than 30 co-ordinates it will form an undirected edge with that node.
     linking_length = None
     if 'gas' in file_name:
         linking_length = 30
     elif 'CORTEX' in file_name:
+        # This is a bit arbitary
         linking_length = 30
     else:
         linking_length = 15
 
+    # Based on the linking length now if the pixel is less than that linking length far from
+    # our node in consideration we create an edge for those two pixels.
     for x,y in potential_nodes:
         pos_i = matrix_map[(x, y)]
         for i,j in potential_nodes:
@@ -163,7 +145,7 @@ def network_properties(file_name: str):
     degree_centrality = [0]*number_of_nodes
     for x in range(number_of_nodes):
         edges = sum(adjacency_matrix[x])
-        degree_centrality[x] = edges/number_of_nodes
+        degree_centrality[x] = edges/(number_of_nodes-1)
         total_edges += sum(adjacency_matrix[x])
 
     # Here we compute the clustering coefficient for each node
@@ -192,6 +174,7 @@ def network_properties(file_name: str):
     # the average value in the paper for cosmic web is 3.8 ~ 4.1
     print(average_connections)
 
+    # From this module, we return all the important network properties.
     network_properties = {
         'total_nodes' : number_of_nodes,
         'average_connections': average_connections,
