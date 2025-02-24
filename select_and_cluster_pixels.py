@@ -51,7 +51,8 @@ def extract_and_cluster_pixels(file_name: str, threshold):
     # The node here represents a cluster of pixels, not necessarily a pixel by itself.
 
     labeled_array, num_nodes = label(binary_mask)
-    '''labeled_array is a matrix to distinguish the pixels
+    '''
+    labeled_array is a matrix to distinguish the pixels
     that are together from the pixels that are not together, based on the location of the pixels.
     If the pixel has a value above the threshold put, and the pixel on its right/left/below/above also have
     a value that is higher than the threshold, then it is considered as one Node. This process keeps
