@@ -1,17 +1,32 @@
-import network_analysis
+'''
+It is based on the paper "The Quantitative comparison between the Neuronal Network and the Cosmic Web" by
+"F. Vazza and A. Feletti". A link to the paper
+is https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2020.525731/full. #All the data used in the
+paper are in the website for the authors
+'''
+
+import MRP_network_analysis
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.ticker as ticker
 
-# Importing fits file
+'''
+This module is for plotting the graph in the Figure 3 of the paper.
+First we import the fits file for brain cerebellum, brain cortex and cosmic web images.
+
+Then we use the MRP_network_analysis algorithm to gather the network properties
+for each image type.
+
+Then we use these network properties to recreate the graph in figure 3 of the paper.
+'''
 file_name = 'CEREBELLUM40.fits'
-cerebellum_properties = network_analysis.network_properties(file_name)
+cerebellum_properties = MRP_network_analysis.network_properties(file_name)
 
 file_name = "map_gasDMD_188_1024_X_D.fits"
-cosmic_web_properties = network_analysis.network_properties(file_name)
+cosmic_web_properties = MRP_network_analysis.network_properties(file_name)
 
 file_name = 'CORTEX40.fits'
-cortex_properties = network_analysis.network_properties(file_name)
+cortex_properties = MRP_network_analysis.network_properties(file_name)
 
 cer_total_nodes = cerebellum_properties['total_nodes']
 cer_clustering_coefficient = cerebellum_properties['clustering_coefficient']
@@ -79,11 +94,6 @@ axes[1].minorticks_on()
 axes[1].xaxis.set_minor_locator(ticker.MultipleLocator(0.001))  # Minor ticks every 0.5 units
 axes[1].yaxis.set_minor_locator(ticker.MultipleLocator(0.1))
 axes[1].grid(which='both', linestyle='--', linewidth=0.5)
-
-# plt.hist(clustering_coefficient, bins=30, density=True, color='skyblue', edgecolor='black', alpha=0.7)
-# plt.imshow(dark_matter_density_data, cmap='gray', origin='lower')
-# plt.colorbar()
-# plt.title("FITS Image")
 
 plt.tight_layout()
 plt.show()

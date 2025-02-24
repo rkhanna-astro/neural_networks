@@ -1,4 +1,3 @@
-## From Majd
 ## This page is for Midterm project of Neural network.
 '''
 It is based on the paper "The Quantitative comparison between the Neuronal Network and the Cosmic Web" by
@@ -7,35 +6,21 @@ is https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2020.52573
 paper are in the website for the authors
 '''
 
-
-#This is a python code to mimic a figure in the paper. The figure that we are aimin to mimic is figure 3 from the paper
 ## Importing the libraries and modules
 
-import matplotlib.image as mpimg
-from IPython.display import Image
 import numpy as np
-#import pandas as pd
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from scipy import stats
-from scipy.stats import shapiro, kstest
 from scipy.ndimage import label
 from scipy.ndimage import sum_labels
 
+# import matplotlib.image as mpimg
+# from IPython.display import Image
+# from scipy import stats
+# import pandas as pd
+# from scipy.stats import shapiro, kstest
 
-## Themimage we want to mimic is the following
-
-# Image(filename="Figure_to_mimic_j.jpg", width=500, height=500) # the image to mimic is called "Figure_to_mimic_j.jpg"
-# img = mpimg.imread("Figure_to_mimic_j.jpg")
-
-# plt.figure(1)
-# plt.imshow(img)
-# plt.axis("off")  # Hide axes
-# plt.show()
-
-## The code for the fits file
-
-def extract_nodes(file_name: str, threshold):
+def extract_and_cluster_pixels(file_name: str, threshold):
 
     if 'map' in file_name:
         # the file name. the file should be in the same directory
@@ -46,11 +31,11 @@ def extract_nodes(file_name: str, threshold):
         fits_file = fits.open(file_name) # opening the fits file
         image_data = fits_file[0].data
     
-    max_density = np.max(image_data)
-    length = image_data.shape[0]
-    width = image_data.shape[1]
+    # max_density = np.max(image_data)
+    # length = image_data.shape[0]
+    # width = image_data.shape[1]
 
-    # Normalizing the values for lower computational costs
+    # Normalizing the values for lower computational costs and easier calculations
     # for x in range(length):
     #     for y in range(width):
     #         image_data[x][y] = image_data[x][y]/max_density
@@ -75,6 +60,7 @@ def extract_nodes(file_name: str, threshold):
     '''
     # Summing the pixel value in each node
     node_fluxes = sum_labels(image_data, labeled_array, index=np.arange(1, num_nodes + 1))
+    
     ## Extracting the X and Y coordinates for each node
     nodes = {}  # Dictionary to store node information
 
@@ -91,15 +77,23 @@ def extract_nodes(file_name: str, threshold):
     #     print(f"Node {node_id}:")
     #     print(f"  Coordinates: {data['coords']}")
     #     print(f"  Total Flux: {data['total_flux']:.3e}\n")
-    print(f"the total number of nodes with a value higher than threshold {threshold} is " + str(num_nodes))
+    # print(f"the total number of nodes with a value higher than threshold {threshold} is " + str(num_nodes))
 
-    # Plot the labeled nodes
+    '''
+    Plot the labeled nodes to verify visually that the clustered pixels are the high intensity regions
+    in the three cases we are handling.
+
+    Through this clustering approach we got most of the high-intensity regions contained as clustered pixels.
+    '''
     plt.figure(2)
     plt.imshow(labeled_array, cmap='nipy_spectral', origin='lower')
     plt.colorbar(label="Node Label")
     plt.title(f"Identified Nodes (Threshold: {threshold})")
     plt.show()
 
+    '''
+    From here we return the clustered pixels as nodes and labelled array for analysis if needed
+    '''
     return {
         'nodes': nodes, 
         'plots': labeled_array,

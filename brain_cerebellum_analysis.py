@@ -1,10 +1,21 @@
-import network_analysis
+'''
+It is based on the paper "The Quantitative comparison between the Neuronal Network and the Cosmic Web" by
+"F. Vazza and A. Feletti". A link to the paper
+is https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2020.525731/full. #All the data used in the
+paper are in the website for the authors
+'''
+
+import MRP_network_analysis
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Importing fits file
+# Importing CEREBELLUM fits file
 file_name = 'CEREBELLUM40.fits'
-cerebellum_properties = network_analysis.network_properties(file_name)
+
+'''
+Here, we go through the fits file for the brain CEREBELLUM images to study the network properties.
+'''
+cerebellum_properties = MRP_network_analysis.network_properties(file_name)
 
 total_nodes = cerebellum_properties['total_nodes']
 clustering_coefficient = cerebellum_properties['clustering_coefficient']
@@ -30,9 +41,5 @@ axes[1].set_xlabel("degree centrality C_d")
 axes[1].set_ylabel("N(C_d)/N_total")
 axes[1].hist(bins_2[:-1], bins_2, weights=fractions_degree, histtype='step', linewidth = 2)
 
-# plt.hist(clustering_coefficient, bins=30, density=True, color='skyblue', edgecolor='black', alpha=0.7)
-# plt.imshow(dark_matter_density_data, cmap='gray', origin='lower')
-# plt.colorbar()
-# plt.title("FITS Image")
 plt.tight_layout()
 plt.show()

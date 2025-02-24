@@ -1,17 +1,27 @@
-import network_analysis
+'''
+It is based on the paper "The Quantitative comparison between the Neuronal Network and the Cosmic Web" by
+"F. Vazza and A. Feletti". A link to the paper
+is https://www.frontiersin.org/journals/physics/articles/10.3389/fphy.2020.525731/full. #All the data used in the
+paper are in the website for the authors
+'''
+
+import MRP_network_analysis
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Importing fits file
+# Importing Cosmic web FITS files for network analysis.
 files = ['D']
 nodes_data = []
 connectivity_data = []
 
-# fig_1, axes_1 = plt.subplots(2)
-
+'''
+Here, we go through each fits file for COSMIC web images to study their network properties.
+We also collect and compare their total nodes data and average connectivity values to see 
+how consistent our algorithm is performing for every case.
+'''
 for file in files:
     file_name = f"map_gasDMD_188_1024_X_{file}.fits"
-    cosmic_web_properties = network_analysis.network_properties(file_name)
+    cosmic_web_properties = MRP_network_analysis.network_properties(file_name)
 
     total_nodes = cosmic_web_properties['total_nodes']
     nodes_data.append(total_nodes)
@@ -44,15 +54,5 @@ for file in files:
     axes[1].set_ylabel("N(C_d)/N_total")
     axes[1].hist(bins_2[:-1], bins_2, weights=fractions_degree, histtype='step', linewidth = 2)
 
-    # plt.hist(clustering_coefficient, bins=30, density=True, color='skyblue', edgecolor='black', alpha=0.7)
-    # plt.imshow(dark_matter_density_data, cmap='gray', origin='lower')
-    # plt.colorbar()
-    # plt.title("FITS Image")
-
-# axes_1[0].plot(files, nodes_data, marker='s')
-# axes_1[0].set_title(f"Total Nodes")
-
-# axes_1[1].plot(files, connectivity_data, marker='o')
-# axes_1[1].set_title(f"Average Connectivity")
 plt.tight_layout()
 plt.show()
